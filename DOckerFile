@@ -1,0 +1,14 @@
+# Use the official PHP image with Apache
+FROM php:8.2-apache
+
+# Copy your PHP files into the web root directory
+COPY . /var/www/html/
+
+# Enable Apache mod_rewrite (commonly used for clean URLs)
+RUN a2enmod rewrite
+
+# Change permissions if needed (optional)
+# RUN chown -R www-data:www-data /var/www/html
+
+# Expose port 80 (Render requires this)
+EXPOSE 80
