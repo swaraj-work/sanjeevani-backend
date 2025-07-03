@@ -3,7 +3,7 @@ services:
     name: sanjeevani-backend
     env: docker
     plan: free
-    dockerfilePath: ./DockerFile
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: PORT
         value: 80

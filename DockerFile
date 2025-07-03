@@ -13,7 +13,9 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     zip \
     unzip \
-    git
+    git \
+    libonig-dev \
+    libzip-dev
 
 # Install PHP extensions required for the application
 RUN docker-php-ext-install \
