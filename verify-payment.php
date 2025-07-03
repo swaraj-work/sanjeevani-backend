@@ -7,9 +7,21 @@
 
 require_once __DIR__ . '/config.php';
 
+// Add CORS headers explicitly here too
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Max-Age: 86400'); // 24 hours
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit(0);
+}
+
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendJsonResponse(['error' => 'Method not allowed'], 405);
+    sendJsonResponse(['success' => false, 'error' => 'Method not allowed'], 405);
 }
 
 // Read request body
@@ -27,7 +39,7 @@ logMessage("Payment Verification Request: " . json_encode($log_data));
 if (!isset($request_data['razorpay_payment_id']) || 
     !isset($request_data['razorpay_order_id']) || 
     !isset($request_data['razorpay_signature'])) {
-    sendJsonResponse(['error' => 'Missing required payment details'], 400);
+    sendJsonResponse(['success' => false, 'error' => 'Missing required payment details'], 400);
 }
 
 $razorpay_payment_id = $request_data['razorpay_payment_id'];
@@ -76,7 +88,7 @@ try {
             'email' => $form_data['email'] ?? '',
             'phone' => $form_data['phone'] ?? '',
             'accommodation' => $form_data['accommodation'] ?? 'no',
-            'amount' => 999, // ₹999
+            'amount' => 100, // ₹1 in paise for testing
             'timestamp' => date('Y-m-d H:i:s'),
             'status' => 'completed'
         ];
@@ -84,14 +96,13 @@ try {
         // Log successful registration
         logMessage("Registration Successful: " . json_encode($payment_data));
         
-        // We no longer save registration data to a JSON file to comply with privacy practices
-        
         // Send successful response
         sendJsonResponse([
             'success' => true,
             'message' => 'Payment verified successfully',
             'order_id' => $razorpay_order_id,
-            'payment_id' => $razorpay_payment_id
+            'payment_id' => $razorpay_payment_id,
+            'data' => $payment_data
         ]);
     } else {
         // Signature verification failed
