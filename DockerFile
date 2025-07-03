@@ -7,6 +7,9 @@ COPY . /var/www/html/
 # Enable Apache mod_rewrite (commonly used for clean URLs)
 RUN a2enmod rewrite
 
+# Enable Apache mod_headers (required for the 'Header' directive in .htaccess)
+RUN a2enmod headers
+
 # Change permissions if needed (optional)
 # RUN chown -R www-data:www-data /var/www/html
 
