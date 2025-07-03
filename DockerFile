@@ -1,17 +1,64 @@
-# Use the official PHP image with Apache
+# Use the official PHP image with Apache, version 8.2
+# This image comes with Apache pre-configured to work with PHP-FPM,
+# making it a good base for web applications.
 FROM php:8.2-apache
 
-# Copy your PHP files into the web root directory
+# Set the working directory inside the container
+# This is where your application files will reside.
+WORKDIR /var/www/html
+
+# Copy your entire application codebase into the web root directory.
+# The `.` ensures all files and subdirectories from your build context are copied.
 COPY . /var/www/html/
 
-# Enable Apache mod_rewrite (commonly used for clean URLs)
+# --- PHP Extension Installation ---
+# Many PHP applications require additional extensions.
+# Use 'docker-php-ext-install' to install common extensions.
+#
+# Common extensions you might need:
+#   mysqli: For MySQL database interaction.
+#   pdo_mysql: For PDO-based MySQL database interaction.
+#   curl: For making HTTP requests (e.g., to external APIs like Razorpay).
+#   json: Often pre-installed but good to explicitly ensure.
+#   mbstring: Multi-byte string functions, often required by frameworks.
+#   zip: For working with zip archives.
+#   gd: For image manipulation.
+#
+# Uncomment and add any extensions your application specifically needs.
+# You can find the full list of available extensions in the PHP manual
+# or by inspecting the image: `docker run --rm php:8.2-apache php -m`
+#
+# Example: If your app uses MySQL and makes API calls:
+RUN docker-php-ext-install \
+    mysqli \
+    pdo_mysql \
+    curl \
+    mbstring \
+    opcache # Opcache improves PHP performance by caching compiled bytecode
+
+# --- Apache Module Configuration ---
+# Enable necessary Apache modules for your application.
+#
+# mod_rewrite: Essential for clean URLs (e.g., if you have an .htaccess file
+#              that redirects /product/123 to /product.php?id=123).
 RUN a2enmod rewrite
 
-# Enable Apache mod_headers (required for the 'Header' directive in .htaccess)
+# mod_headers: Required if your .htaccess uses the 'Header' directive
+#              (which was the error you previously encountered).
 RUN a2enmod headers
 
-# Change permissions if needed (optional)
+# Optional: Set appropriate permissions for web server to write to.
+# This is crucial if your application needs to write files (e.g., uploads, logs).
+# 'www-data' is the default user/group Apache runs as in this image.
+# Only uncomment this if your application specifically needs write permissions
+# for the web server to certain directories. For most read-only static files/PHP,
+# default permissions are usually fine.
 # RUN chown -R www-data:www-data /var/www/html
 
-# Expose port 80 (Render requires this)
+# Expose port 80. This is the standard HTTP port Apache listens on,
+# and Render.com requires this to properly route external traffic to your service.
 EXPOSE 80
+
+# The base 'php:8.2-apache' image automatically sets up Apache to run,
+# so you usually don't need a CMD instruction unless you have custom startup scripts.
+# CMD ["apache2-foreground"] # This is typically the default command for this image
