@@ -1,12 +1,12 @@
 services:
   - type: web
     name: sanjeevani-backend
-    env: php
-    buildCommand: composer install
-    startCommand: composer start
+    env: docker
+    plan: free
+    dockerfilePath: ./DockerFile
     envVars:
       - key: PORT
-        value: 8080
+        value: 80
       - key: NEXT_PUBLIC_RAZORPAY_KEY_ID
         sync: false
       - key: RAZORPAY_KEY_SECRET
