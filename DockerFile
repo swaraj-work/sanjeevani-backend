@@ -11,6 +11,9 @@ WORKDIR /var/www/html
 # The `.` ensures all files and subdirectories from your build context are copied.
 COPY . /var/www/html/
 
+# Install system dependencies for PHP extensions
+RUN apt-get update && apt-get install -y libcurl4-openssl-dev pkg-config
+
 # --- PHP Extension Installation ---
 # Many PHP applications require additional extensions.
 # Use 'docker-php-ext-install' to install common extensions.
