@@ -5,6 +5,10 @@
  * This endpoint creates a new Razorpay order and returns the order details
  */
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+
 require_once __DIR__ . '/config.php';
 
 // Only allow POST requests
